@@ -37,6 +37,33 @@ export const handleLLMRequest = async (req: Request, res: Response): Promise<voi
       return;
     }
 
+    // 0. Extract and validate API Key from Authorization header
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      console.warn(`[${requestId}] Missing or invalid Authorization header`);
+      res.status(401).json({ error: "Unauthorized: Missing or invalid Authorization header" });
+      return;
+    }
+
+    const apiKey = authHeader.split(' ')[1];
+
+    // Validate the key against Supabase
+    const { data: keyData, error: keyError } = await supabase
+      .from('api_keys')
+      .select('organization_id')
+      .eq('key_value', apiKey)
+      .eq('is_active', true)
+      .single();
+
+    if (keyError || !keyData) {
+      console.error(`[${requestId}] Invalid or inactive API Key attempted`);
+      res.status(401).json({ error: "Unauthorized: Invalid or inactive API Key" });
+      return;
+    }
+
+    const organizationId = keyData.organization_id;
+    console.log(`[${requestId}] ✓ API Key validated for organization: ${organizationId}`);
+
     await embeddingModelReady;
 
     // 1. Extract the actual prompt string from the messages array
@@ -75,6 +102,7 @@ export const handleLLMRequest = async (req: Request, res: Response): Promise<voi
       // Log telemetry indicating a CACHED response
       void supabase.from('telemetry_logs').insert([{
         request_id: requestId,
+        organization_id: organizationId,
         user_id: payload.user_id,
         model: 'CACHE_HIT_' + payload.model,
         prompt_tokens: 0,
@@ -129,6 +157,7 @@ export const handleLLMRequest = async (req: Request, res: Response): Promise<voi
     // 6. Log Standard Telemetry
     void supabase.from('telemetry_logs').insert([{
       request_id: requestId,
+      organization_id: organizationId,
       user_id: payload.user_id,
       model: payload.model,
       prompt_tokens: (llmData as { usage?: { prompt_tokens?: number } }).usage?.prompt_tokens || 0,

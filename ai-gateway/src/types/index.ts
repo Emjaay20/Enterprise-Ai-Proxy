@@ -38,6 +38,7 @@ export interface LLMResponse {
 
 export interface TelemetryPayload {
   request_id: string;
+  organization_id: string;
   user_id: string;
   model: string;
   prompt_tokens: number;
