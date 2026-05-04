@@ -68,50 +68,125 @@ export default async function LandingPage() {
           </div>
         </section>
 
-        {/* METRICS BENTO BOX */}
-        <section className="mt-32 grid md:grid-cols-3 gap-6">
-          <div className="p-8 rounded-xl border border-neutral-800 bg-neutral-950/50 flex flex-col justify-between h-64">
-            <Database className="h-6 w-6 text-neutral-400" />
-            <div>
-              <p className="text-4xl font-medium text-white tracking-tight mb-2">&lt; 15ms</p>
-              <p className="text-sm text-neutral-500">Average vector cache hit latency globally.</p>
-            </div>
-          </div>
-          <div className="p-8 rounded-xl border border-neutral-800 bg-neutral-950/50 flex flex-col justify-between h-64">
-            <Shield className="h-6 w-6 text-neutral-400" />
-            <div>
-              <p className="text-4xl font-medium text-white tracking-tight mb-2">100%</p>
-              <p className="text-sm text-neutral-500">SOC2 Type II compliant logging & telemetry.</p>
-            </div>
-          </div>
-          <div className="p-8 rounded-xl border border-neutral-800 bg-neutral-950/50 flex flex-col justify-between h-64">
-            <Activity className="h-6 w-6 text-neutral-400" />
-            <div>
-              <p className="text-4xl font-medium text-white tracking-tight mb-2">99.99%</p>
-              <p className="text-sm text-neutral-500">Uptime SLA backed by multi-region redundancy.</p>
-            </div>
-          </div>
-        </section>
+        {/* CONVERSION SECTION: stacked — copy + metrics on top, playground full-width below */}
+        <section className="mt-32 flex flex-col gap-12">
 
-        {/* DEMO SECTION */}
-        <section className="mt-32">
-          <div className="mb-12 max-w-2xl">
-            <h2 className="text-3xl md:text-4xl font-medium tracking-tight text-white">Interact with the Edge.</h2>
-            <p className="mt-4 text-neutral-400 text-lg">
-              Test our semantic vector engine directly. Send a prompt, view the upstream latency, and send it again to see the sub-20ms cache hit interception.
-            </p>
+          {/* TOP ROW: Explanation left, Metrics right */}
+          <div className="grid lg:grid-cols-[1.2fr_1fr] gap-12 items-start">
+
+            {/* Copy + Steps + Hit/Miss */}
+            <div className="flex flex-col gap-8">
+
+            {/* Step-by-step conversion copy */}
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-widest text-neutral-500 mb-4">Live Demo — Try it yourself</p>
+              <h2 className="text-3xl md:text-4xl font-medium tracking-tight text-white leading-tight">
+                See the cache engine work in real time.
+              </h2>
+              <p className="mt-4 text-neutral-400 leading-relaxed">
+                Send any prompt below. Your request hits our Gateway, gets vectorized, and is checked against the semantic cache. On a <strong className="text-white font-medium">first request</strong>, you'll see a raw LLM round-trip. On a <strong className="text-white font-medium">second request</strong>, our engine intercepts it in milliseconds.
+              </p>
+            </div>
+
+            {/* Step instructions */}
+            <ol className="space-y-5">
+              <li className="flex items-start gap-4">
+                <span className="flex-shrink-0 flex h-7 w-7 items-center justify-center rounded-full border border-neutral-700 text-xs font-semibold text-neutral-300">1</span>
+                <div>
+                  <p className="text-sm font-medium text-white">Type any prompt and hit Send Request.</p>
+                  <p className="text-sm text-neutral-500 mt-0.5">The request is forwarded live to our Gateway running on Groq infrastructure.</p>
+                </div>
+              </li>
+              <li className="flex items-start gap-4">
+                <span className="flex-shrink-0 flex h-7 w-7 items-center justify-center rounded-full border border-neutral-700 text-xs font-semibold text-neutral-300">2</span>
+                <div>
+                  <p className="text-sm font-medium text-white">Watch the Telemetry Table below.</p>
+                  <p className="text-sm text-neutral-500 mt-0.5">Your request logs instantly — latency, token count, and cache status all update in real time.</p>
+                </div>
+              </li>
+              <li className="flex items-start gap-4">
+                <span className="flex-shrink-0 flex h-7 w-7 items-center justify-center rounded-full border border-neutral-700 text-xs font-semibold text-neutral-300">3</span>
+                <div>
+                  <p className="text-sm font-medium text-white">Send the same (or a similar) prompt again.</p>
+                  <p className="text-sm text-neutral-500 mt-0.5">The vector engine detects the semantic match and returns the answer instantly — zero LLM call, zero cost.</p>
+                </div>
+              </li>
+            </ol>
+
+            {/* Cache Hit / Miss explainer */}
+            <div className="grid grid-cols-2 gap-3">
+              <div className="rounded-lg border border-neutral-800 bg-neutral-950 p-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="h-2 w-2 rounded-full bg-neutral-500"></span>
+                  <span className="text-xs font-semibold text-neutral-400 uppercase tracking-widest">Cache Miss</span>
+                </div>
+                <p className="text-xs text-neutral-500 leading-relaxed">
+                  Prompt is new. Gateway embeds it, queries Groq, stores the result. Latency: <span className="text-neutral-300">500–2000ms</span>.
+                </p>
+              </div>
+              <div className="rounded-lg border border-neutral-700 bg-neutral-900 p-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="h-2 w-2 rounded-full bg-white"></span>
+                  <span className="text-xs font-semibold text-white uppercase tracking-widest">Cache Hit</span>
+                </div>
+                <p className="text-xs text-neutral-400 leading-relaxed">
+                  Semantically matched. Cached response returned instantly. Latency: <span className="text-white">under 20ms</span>.
+                </p>
+              </div>
+            </div>
+
+            </div>
+
+            {/* Metrics stacked vertically on the right */}
+            <div className="flex flex-col gap-3 pt-1">
+              <p className="text-xs font-semibold uppercase tracking-widest text-neutral-600 mb-2">Platform Stats</p>
+              <div className="flex items-center justify-between px-5 py-4 rounded-lg border border-neutral-800 bg-neutral-950">
+                <div className="flex items-center gap-3">
+                  <Database className="h-4 w-4 text-neutral-500" />
+                  <span className="text-sm text-neutral-400">Avg. cache hit latency</span>
+                </div>
+                <span className="text-lg font-semibold text-white tracking-tight">&lt; 15ms</span>
+              </div>
+              <div className="flex items-center justify-between px-5 py-4 rounded-lg border border-neutral-800 bg-neutral-950">
+                <div className="flex items-center gap-3">
+                  <Shield className="h-4 w-4 text-neutral-500" />
+                  <span className="text-sm text-neutral-400">Compliance logging</span>
+                </div>
+                <span className="text-lg font-semibold text-white tracking-tight">SOC2 Type II</span>
+              </div>
+              <div className="flex items-center justify-between px-5 py-4 rounded-lg border border-neutral-800 bg-neutral-950">
+                <div className="flex items-center gap-3">
+                  <Activity className="h-4 w-4 text-neutral-500" />
+                  <span className="text-sm text-neutral-400">Platform uptime SLA</span>
+                </div>
+                <span className="text-lg font-semibold text-white tracking-tight">99.99%</span>
+              </div>
+            </div>
+
           </div>
-          
+
+          {/* BOTTOM: Live Playground — full width */}
           <div className="rounded-xl border border-neutral-800 bg-neutral-950/50 overflow-hidden shadow-2xl">
             <div className="border-b border-neutral-800 bg-neutral-900/50 p-4 flex items-center gap-2">
               <Terminal className="h-4 w-4 text-neutral-400" />
               <span className="text-xs font-mono text-neutral-400">~/aether/live-demo</span>
+              <div className="ml-auto flex items-center gap-1.5">
+                <span className="h-2 w-2 rounded-full bg-neutral-700"></span>
+                <span className="h-2 w-2 rounded-full bg-neutral-700"></span>
+                <span className="h-2 w-2 rounded-full bg-neutral-600"></span>
+              </div>
             </div>
-            
-            <div className="p-6 md:p-10">
+            <div className="p-6 md:p-8">
               <PublicPlayground />
             </div>
+            <div className="border-t border-neutral-800 bg-neutral-900/30 px-6 py-4 flex items-center justify-between">
+              <p className="text-xs text-neutral-600">Convinced? Get your own API key in 30 seconds.</p>
+              <Link href="/login" className="text-xs font-medium text-white hover:text-neutral-300 transition-colors flex items-center gap-1">
+                Sign up free <ArrowRight className="h-3 w-3" />
+              </Link>
+            </div>
           </div>
+
         </section>
 
         {/* TELEMETRY SECTION */}
