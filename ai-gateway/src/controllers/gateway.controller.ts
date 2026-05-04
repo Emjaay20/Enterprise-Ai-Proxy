@@ -2,7 +2,16 @@
 import { Request, Response } from 'express';
 import { GatewayRequest, TelemetryPayload } from '../types';
 import { supabase } from '../config/supabase';
-import { randomUUID } from 'crypto';
+import { randomUUID, createHash } from 'crypto';
+
+/**
+ * Hashes an incoming raw API key using SHA-256 so we can
+ * compare it against the stored hash in the database.
+ * The plain-text key is never stored or logged.
+ */
+function hashApiKey(rawKey: string): string {
+  return createHash('sha256').update(rawKey).digest('hex');
+}
 
 // Dynamically import the local embedding model
 let pipeline: any;
@@ -47,11 +56,14 @@ export const handleLLMRequest = async (req: Request, res: Response): Promise<voi
 
     const apiKey = authHeader.split(' ')[1];
 
-    // Validate the key against Supabase
+    // Hash the incoming raw key — we compare hashes, never plain-text keys
+    const hashedKey = hashApiKey(apiKey);
+
+    // Validate the hashed key against Supabase
     const { data: keyData, error: keyError } = await supabase
       .from('api_keys')
       .select('organization_id')
-      .eq('key_value', apiKey)
+      .eq('key_value', hashedKey)
       .eq('is_active', true)
       .single();
 

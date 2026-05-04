@@ -2,6 +2,9 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
 const GATEWAY_URL = process.env.GATEWAY_URL || 'http://localhost:4000';
+// The DEMO_API_KEY is a plain-text key whose SHA-256 hash is stored in the DB under is_active=true.
+// This allows the public playground to make authenticated gateway requests without exposing any user keys.
+const DEMO_API_KEY = process.env.DEMO_API_KEY;
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -53,24 +56,19 @@ export async function POST(request: Request) {
       max_tokens: 60, // Hard cap generation output to ~60 tokens to keep Groq costs near zero
     };
 
-    // 4. Dynamically fetch a valid API key to use for the proxy/demo requests
-    const { data: keyData } = await supabase
-      .from('api_keys')
-      .select('key_value')
-      .eq('is_active', true)
-      .limit(1)
-      .single();
-
-    if (!keyData?.key_value) {
-      return NextResponse.json({ error: 'No active API keys available in the system for routing.' }, { status: 500 });
+    // 4. Use the dedicated demo API key from environment variables.
+    // This key's SHA-256 hash is pre-stored in the Supabase api_keys table.
+    // We never look up or expose any user's key here.
+    if (!DEMO_API_KEY) {
+      return NextResponse.json({ error: 'Demo service is not configured. Please contact support.' }, { status: 503 });
     }
 
-    // 5. Forward safe request to Gateway
+    // 5. Forward safe request to Gateway using the dedicated demo key
     const res = await fetch(`${GATEWAY_URL}/v1/chat/completions`, {
       method: 'POST',
       headers: { 
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${keyData.key_value}`
+        'Authorization': `Bearer ${DEMO_API_KEY}`
       },
       body: JSON.stringify(safeBody),
     });
