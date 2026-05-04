@@ -56,6 +56,12 @@ export const handleLLMRequest = async (req: Request, res: Response): Promise<voi
 
     const apiKey = authHeader.split(' ')[1];
 
+    // Guard: ensure the token is actually present after "Bearer "
+    if (!apiKey) {
+      res.status(401).json({ error: 'Unauthorized: Malformed Authorization header' });
+      return;
+    }
+
     // Hash the incoming raw key — we compare hashes, never plain-text keys
     const hashedKey = hashApiKey(apiKey);
 
