@@ -13,7 +13,7 @@ interface TelemetryLog {
   latency_ms: number;
   status: string;
   eval_context: { environment: string; expected_task: string } | null;
-  timestamp: string;
+  created_at: string;
 }
 
 interface TelemetryTableProps {
@@ -66,7 +66,7 @@ export function TelemetryTable({ logs }: TelemetryTableProps) {
   const [itemsPerPage, setItemsPerPage] = useState(10);
 
   const sortedLogs = useMemo(() => {
-    return [...(logs ?? [])].sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+    return [...(logs ?? [])].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
   }, [logs]);
 
   const totalPages = Math.ceil((sortedLogs?.length ?? 0) / itemsPerPage);
@@ -115,21 +115,21 @@ export function TelemetryTable({ logs }: TelemetryTableProps) {
   };
 
   return (
-    <section className="rounded-md border border-white/10 bg-[linear-gradient(145deg,rgba(18,23,31,0.8),rgba(10,14,21,0.95))]">
-      <div className="flex items-center justify-between border-b border-white/10 px-5 py-4 md:px-6">
+    <section className="rounded-xl border border-neutral-800 bg-black">
+      <div className="flex items-center justify-between border-b border-neutral-800 px-5 py-4 md:px-6">
         <div>
-          <h2 className="text-lg font-medium text-white">Telemetry Table</h2>
-          <p className="mt-1 text-sm text-white/45">Most recent gateway executions with latency, token usage, and status.</p>
+          <h2 className="text-lg font-medium text-white tracking-tight">Telemetry Log</h2>
+          <p className="mt-1 text-sm text-neutral-500">Live feed of global request data.</p>
         </div>
-        <div className="rounded-[2px] border border-emerald-400/20 bg-emerald-400/10 px-3 py-1.5 text-xs font-medium uppercase tracking-[0.14em] text-emerald-300">
-          Streaming live
+        <div className="rounded-full border border-neutral-800 bg-neutral-900 px-3 py-1 text-xs font-medium text-neutral-300 flex items-center gap-2">
+          <span className="flex h-2 w-2 rounded-full bg-neutral-400"></span> Live
         </div>
       </div>
 
       <div className="overflow-x-auto">
         <table className="w-full text-left text-sm">
-          <thead className="text-xs uppercase tracking-[0.2em] text-white/35">
-            <tr className="border-b border-white/10">
+          <thead className="text-xs uppercase tracking-widest text-neutral-500 bg-neutral-950/50">
+            <tr className="border-b border-neutral-800">
               <th className="px-5 py-4 font-medium md:px-6">Timestamp</th>
               <th className="px-5 py-4 font-medium md:px-6">Developer ID</th>
               <th className="px-5 py-4 font-medium md:px-6">Model</th>
@@ -139,39 +139,37 @@ export function TelemetryTable({ logs }: TelemetryTableProps) {
               <th className="px-5 py-4 font-medium text-center md:px-6">Status</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-white/10">
+          <tbody className="divide-y divide-neutral-800">
             {paginatedLogs.map((log: TelemetryLog) => (
-              <tr key={log.id} className="transition-colors hover:bg-white/[0.025]">
-                <td className="px-5 py-4 whitespace-nowrap text-white/50 md:px-6">
-                  {formatDistanceToNow(new Date(log.timestamp), { addSuffix: true })}
+              <tr key={log.id} className="transition-colors hover:bg-neutral-900/50">
+                <td className="px-5 py-4 whitespace-nowrap text-neutral-400 md:px-6">
+                  {formatDistanceToNow(new Date(log.created_at), { addSuffix: true })}
                 </td>
-                <td className="px-5 py-4 font-mono text-cyan-300 md:px-6">{log.user_id}</td>
+                <td className="px-5 py-4 font-mono text-neutral-300 md:px-6">{log.user_id}</td>
                 <td className="px-5 py-4 md:px-6">
-                  <span className="inline-flex rounded-[2px] border border-white/10 bg-white/[0.03] px-3 py-1.5 text-xs font-medium text-white/75">
+                  <span className="inline-flex rounded-md border border-neutral-800 bg-neutral-900 px-2.5 py-1 text-xs font-medium text-neutral-300">
                     {log.model}
                   </span>
                 </td>
-                <td className="max-w-xs truncate px-5 py-4 text-white/70 md:px-6">{log.eval_context?.expected_task || '—'}</td>
+                <td className="max-w-xs truncate px-5 py-4 text-neutral-400 md:px-6">{log.eval_context?.expected_task || '—'}</td>
                 <td className="px-5 py-4 text-right tabular-nums md:px-6">
-                  <div className="flex items-center justify-end gap-1.5 text-amber-300">
-                    <IconClock className="h-3.5 w-3.5" />
+                  <div className="flex items-center justify-end gap-1.5 text-neutral-300">
                     {log.latency_ms}ms
                   </div>
                 </td>
-                <td className="px-5 py-4 text-right tabular-nums text-white/55 md:px-6">
+                <td className="px-5 py-4 text-right tabular-nums text-neutral-400 md:px-6">
                   <div className="flex items-center justify-end gap-1.5">
-                    <IconZap className="h-3.5 w-3.5 text-sky-300" />
                     {log.prompt_tokens + log.completion_tokens}
                   </div>
                 </td>
                 <td className="px-5 py-4 text-center md:px-6">
                   {log.status === 'success' ? (
-                    <span className="inline-flex items-center gap-2 rounded-[2px] border border-emerald-400/20 bg-emerald-400/10 px-3 py-1 text-xs font-medium text-emerald-300">
-                      <IconCheck className="h-3.5 w-3.5" /> Success
+                    <span className="inline-flex items-center gap-2 text-xs font-medium text-neutral-400">
+                      Success
                     </span>
                   ) : (
-                    <span className="inline-flex items-center gap-2 rounded-[2px] border border-red-400/20 bg-red-400/10 px-3 py-1 text-xs font-medium text-red-300">
-                      <span className="h-2 w-2 rounded-full bg-red-400" /> Failed
+                    <span className="inline-flex items-center gap-2 text-xs font-medium text-neutral-500">
+                      Failed
                     </span>
                   )}
                 </td>

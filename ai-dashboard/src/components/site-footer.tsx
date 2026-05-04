@@ -1,54 +1,74 @@
 import Link from 'next/link';
+import { ArrowUpRight } from 'lucide-react';
 
 const footerColumns = [
   {
-    title: 'API Documentation',
+    title: 'Product',
     links: [
-      { label: 'SDK Reference', href: '/docs' },
-      { label: 'Gateway Endpoints', href: '/docs' },
+      { label: 'Documentation', href: '/docs' },
+      { label: 'Console Dashboard', href: '/dashboard' },
+      { label: 'Login', href: '/login' },
     ],
   },
   {
-    title: 'Changelog',
+    title: 'Developer',
     links: [
-      { label: 'Privacy Policy', href: '#privacy' },
-      { label: 'Data Retention', href: '#retention' },
-    ],
-  },
-  {
-    title: 'Terms of Service',
-    links: [
-      { label: 'Security', href: '#security' },
-      { label: 'Compliance', href: '#compliance' },
+      { label: 'Portfolio', href: 'https://yusuf-saka-portfolio.vercel.app/', external: true },
+      { label: 'GitHub', href: 'https://github.com/Emjaay20', external: true },
+      { label: 'LinkedIn', href: 'https://www.linkedin.com/in/yusuf-saka/', external: true },
     ],
   },
 ];
 
 export function SiteFooter() {
   return (
-    <footer className="mt-10 border-t border-white/10 bg-[#04070d]">
-      <div className="mx-auto grid w-full max-w-[1200px] gap-8 px-4 py-10 md:grid-cols-[1.3fr_1fr_1fr_1fr] md:px-6">
-        <div>
-          <div className="text-xs uppercase tracking-[0.2em] text-white/35">Aether Control</div>
-          <p className="mt-3 max-w-xs text-xs uppercase leading-6 tracking-[0.18em] text-white/25">
-            © 2026 Obsidian Flux AI. All rights reserved.
+    <footer className="mt-10 border-t border-neutral-800 bg-black text-neutral-400">
+      <div className="mx-auto flex flex-col md:flex-row w-full max-w-[1200px] justify-between gap-12 px-6 py-16">
+
+        <div className="flex flex-col">
+          <div className="text-lg font-bold uppercase tracking-tight text-white mb-4">
+            Aether Control
+          </div>
+          <p className="max-w-xs text-sm leading-relaxed text-neutral-500">
+            Enterprise AI Proxy and Semantic Caching layer. Built for modern LLM infrastructure.
+          </p>
+          <p className="mt-8 text-xs text-neutral-600">
+            © {new Date().getFullYear()} Yusuf Saka. All rights reserved.
           </p>
         </div>
 
-        {footerColumns.map((col) => (
-          <div key={col.title} className="space-y-3">
-            <h3 className="text-xs uppercase tracking-[0.2em] text-white/35">{col.title}</h3>
-            <ul className="space-y-2">
-              {col.links.map((link) => (
-                <li key={link.label}>
-                  <Link href={link.href} className="text-xs uppercase tracking-[0.16em] text-white/55 transition hover:text-cyan-300">
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-        ))}
+        <div className="flex gap-16 sm:gap-24">
+          {footerColumns.map((col) => (
+            <div key={col.title} className="flex flex-col gap-4">
+              <h3 className="text-sm font-semibold text-white">{col.title}</h3>
+              <ul className="flex flex-col gap-3">
+                {col.links.map((link) => (
+                  <li key={link.label}>
+                    {link.external ? (
+                      <a
+                        href={link.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-sm text-neutral-400 hover:text-white transition-colors flex items-center gap-1 group"
+                      >
+                        {link.label}
+                        <ArrowUpRight className="h-3 w-3 opacity-50 group-hover:opacity-100 transition-opacity" />
+                      </a>
+                    ) : (
+                      <Link
+                        href={link.href}
+                        className="text-sm text-neutral-400 hover:text-white transition-colors"
+                      >
+                        {link.label}
+                      </Link>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+
       </div>
     </footer>
   );
